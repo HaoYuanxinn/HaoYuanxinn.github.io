@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Portfolio | 个人主页</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- 核心变量与重置 --- */
+        :root {
+            --bg-color: #0f0f10;
+            --card-bg: #1a1a1c;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --accent-color: #d4af37; /* 香槟金 */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.8;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        ul { list-style: none; }
+
+        /* --- 布局工具 --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .section-padding {
+            padding: 120px 0;
+        }
+
+        /* --- 导航栏 --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(15, 15, 16, 0.85); 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-color);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* --- Hero Section (轮播修改版) --- */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden; /* 防止图片放大溢出 */
+        }
+
+        /* 轮播容器 */
+        .slideshow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* 在最底层 */
+        }
+
+        /* 单张幻灯片样式 */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* 保留视差效果 */
+            opacity: 0; /* 默认隐藏 */
+            /* 关键：1.5秒的透明度过渡，让切换非常柔和 */
+            transition: opacity 1.5s ease-in-out, transform 6s ease; 
+            transform: scale(1);
+        }
+
+        /* 激活状态 */
+        .slide.active {
+            opacity: 1;
+            transform: scale(1.05); /* 激活时微微放大，增加动态感 */
+        }
+
+        /* 黑色遮罩层：盖在轮播图上面，文字下面 */
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* 50% 黑色遮罩 */
+            z-index: 1;
+        }
+
+        .hero-content {
+            z-index: 2; /* 文字在最上层 */
+            position: relative;
+            width: 100%;
+        }
+
+        .hero-subtitle {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: 5rem;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #ffffff, #bbbbbb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .hero-desc {
+            max-width: 500px;
+            color: #d0d0d0;
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #000;
+        }
+
+        /* 装饰性背景元素 */
+        .glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* --- 作品集 Section --- */
+        .section-header {
+            margin-bottom: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+            group;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+            filter: grayscale(20%);
+        }
+
+        .card:hover .card-image img {
+            transform: scale(1.05);
+            filter: grayscale(0%);
+        }
+
+        .card-info {
+            padding: 30px;
+        }
+
+        .card-category {
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        /* --- 关于我 Section --- */
+        .about-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .about-img {
+            width: 100%;
+            height: 600px;
+            object-fit: cover;
+            filter: grayscale(100%);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        
+        .about-img:hover {
+            filter: grayscale(0%);
+        }
+
+        .about-text h3 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .about-text p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* --- 页脚 --- */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .social-icons {
+            margin-bottom: 30px;
+        }
+
+        .social-icons a {
+            margin: 0 15px;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .social-icons a:hover {
+            color: var(--accent-color);
+            transform: translateY(-3px);
+            display: inline-block;
+        }
+
+        .copyright {
+            font-size: 0.8rem;
+            color: #555;
+            letter-spacing: 1px;
+        }
+
+        /* --- 动画类 --- */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- 移动端适配 --- */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .about-layout { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .container { padding: 0 20px; }
+            .slide { background-attachment: scroll; } 
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">HaoYuanxin.</div>
+        <div class="nav-links">
+            <a href="#hero">主页</a>
+            <a href="#work">作品</a>
+            <a href="#about">关于</a>
+            <a href="#contact">联系</a>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="slideshow-container">
+            <div class="slide active" style="background-image: url('https://vcg05.cfp.cn/creative/vcg/nowater800/new/VCG211320891907.jpg?x-oss-process=image/format,webp');"></div>
+            <div class="slide" style="background-image: url('https://vcg05.cfp.cn/creative/vcg/nowater800/new/VCG211549893965.jpg?x-oss-process=image/format,webp');"></div>
+            <div class="slide" style="background-image: url('https://vcg05.cfp.cn/creative/vcg/nowater800/new/VCG211543478599.jpg?x-oss-process=image/format,webp');"></div>
+            <div class="slide" style="background-image: url('https://vcg02.cfp.cn/creative/vcg/nowater800/new/VCG211397283787.jpg?x-oss-process=image/format,webp');"></div>
+            <div class="slide" style="background-image: url('https://vcg05.cfp.cn/creative/vcg/nowater800/new/VCG211525350302.jpg?x-oss-process=image/format,webp');"></div>
+            
+        </div>
+
+        <div class="glow"></div>
+        <div class="container">
+            <div class="hero-content fade-in-up">
+                <span class="hero-subtitle">Art & Code</span>
+                <h1 class="hero-title">规格严格 功夫到家.<br>Harbin Institute of Technology</h1>
+                <p class="hero-desc">
+                    你好，我是哈尔滨工业大学<br>
+                    哈尔滨市南岗区西大直街92号
+                </p>
+                <a href="#work" class="btn">浏览作品</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="work" class="section-padding">
+        <div class="container">
+            <div class="section-header fade-in-up">
+                <h2 class="section-title">Selected Works</h2>
+                <span style="color: var(--text-muted); letter-spacing: 2px; font-size: 0.8rem;">2023 - 2025</span>
+            </div>
+
+            <div class="grid">
+                <div class="card fade-in-up" style="transition-delay: 0.1s;">
+                    <div class="card-image">
+                        <img src="https://www.hit.edu.cn/_upload/article/images/0a/1c/089dcc7b4e0db00675d56ec8b5cf/5e00166d-5992-4efa-bf4a-3ffb27b4b6ea.jpg" alt="Project 1">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-category">11月21日</div>
+                        <h3 class="card-title">祝贺！哈工大新增院士2+1</h3>
+                    </div>
+                </div>
+
+                <div class="card fade-in-up" style="transition-delay: 0.2s;">
+                    <div class="card-image">
+                        <img src="https://www.hit.edu.cn/_upload/article/images/7d/18/0c62782a4587863ca038f24d822a/0efe6b66-a362-4824-a5fd-ecb5b81ae903.jpg" alt="Project 2">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-category">11月17日</div>
+                        <h3 class="card-title">点赞！来看哈工大十佳大学生的青春答卷～</h3>
+                    </div>
+                </div>
+
+                <div class="card fade-in-up" style="transition-delay: 0.3s;">
+                    <div class="card-image">
+                        <img src="https://www.hit.edu.cn/_upload/article/images/2e/7c/6eea335d4ad7a8b3bba4f63215f4/935a5d4b-3e17-4b25-a7cb-f84a713078aa.jpg" alt="Project 3">
+                    </div>
+                    <div class="card-info">
+                        <div class="card-category">11月23日</div>
+                        <h3 class="card-title">哈工大以尖兵文化凝聚奋进力量</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section-padding" style="background-color: #0a0a0b;">
+        <div class="container">
+            <div class="about-layout">
+                <div class="fade-in-up">
+                    <img src="https://vcg02.cfp.cn/creative/vcg/nowater800/new/VCG211579338048.jpg?x-oss-process=image/format,webp" alt="Portrait" class="about-img">
+                </div>
+                <div class="about-text fade-in-up">
+                    <span style="color: var(--accent-color); letter-spacing: 2px; text-transform: uppercase;">About Me</span>
+                    <h3>哈工大以尖兵文化<br>凝聚奋进力量</h3>
+                    <p>非凡“十四五”，喜迎党代会：扎根中国大地，哈工大向“新”而行！</p>
+                    <p>薪火相承，迈向前列！哈工大举行新当选院士座谈会</p>
+                    <br>
+                    <a href="#contact" style="border-bottom: 1px solid var(--accent-color); padding-bottom: 5px;">了解更多 -></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container fade-in-up">
+            <h2 style="font-family: var(--font-serif); font-size: 2.5rem; margin-bottom: 40px;">Let's create something<br>meaningful together.</h2>
+            
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-dribbble"></i></a>
+            </div>
+
+            <div class="copyright">
+                &copy; HIT 2025. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. 元素显现动画 (Fade In Up) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, observerOptions);
+
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach(el => observer.observe(el));
+        });
+
+        // --- 2. 首页背景轮播逻辑 (Background Slideshow) ---
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        const slideInterval = 3000; // 5000ms = 5秒切换一次
+
+        function nextSlide() {
+            // 移除当前 slide 的 active 类
+            slides[currentSlide].classList.remove('active');
+            
+            // 计算下一张图片的索引 (取余数实现循环)
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            // 给下一张 slide 添加 active 类
+            slides[currentSlide].classList.add('active');
+        }
+
+        // 启动定时器
+        setInterval(nextSlide, slideInterval);
+    </script>
+</body>
+</html>
